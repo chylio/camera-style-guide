@@ -14,33 +14,52 @@
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
         }
+        .watermark-footer {
+            position: fixed;
+            right: 2vw;
+            bottom: 2vw;
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s;
+            color: #b0b0b0;
+            font-size: 1rem;
+            font-weight: 500;
+            background: none;
+            user-select: none;
+            letter-spacing: 0.05em;
+            text-shadow: 0 1px 6px #fff, 0 0 2px #aaa;
+        }
+        .watermark-footer.visible {
+            opacity: 0.46;
+            pointer-events: auto;
+        }
     </style>
 </head>
 <body>
     <div id="root"></div>
-    
+    <!-- watermark footer -->
+    <div id="watermark-footer" class="watermark-footer">
+        2025奇美醫院教學中心 吳曉琪製
+    </div>
     <script type="text/babel">
-        const { useState, useMemo } = React;
-        
+        const { useState, useMemo, useEffect } = React;
         // Lucide Icons (simplified)
         const Camera = () => React.createElement('svg', { width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
             React.createElement('path', { d: 'M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z' }),
             React.createElement('circle', { cx: 12, cy: 13, r: 3 })
         );
-        
         const Palette = () => React.createElement('svg', { width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
             React.createElement('circle', { cx: 13.5, cy: 6.5, r: 0.5 }),
             React.createElement('circle', { cx: 17.5, cy: 10.5, r: 0.5 }),
             React.createElement('circle', { cx: 8.5, cy: 7.5, r: 0.5 }),
             React.createElement('circle', { cx: 6.5, cy: 12.5, r: 0.5 }),
-            React.createElement('path', { d: 'M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z' })
+            React.createElement('path', { d: 'M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.9' })
         );
-        
         const Eye = () => React.createElement('svg', { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
             React.createElement('path', { d: 'M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z' }),
             React.createElement('circle', { cx: 12, cy: 12, r: 3 })
         );
-        
         const Move = () => React.createElement('svg', { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
             React.createElement('polyline', { points: '5,9 2,12 5,15' }),
             React.createElement('polyline', { points: '9,5 12,2 15,5' }),
@@ -49,7 +68,6 @@
             React.createElement('line', { x1: 2, y1: 12, x2: 22, y2: 12 }),
             React.createElement('line', { x1: 12, y1: 2, x2: 12, y2: 22 })
         );
-        
         const Aperture = () => React.createElement('svg', { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
             React.createElement('circle', { cx: 12, cy: 12, r: 10 }),
             React.createElement('line', { x1: 14.31, y1: 8, x2: 20.05, y2: 17.94 }),
@@ -59,21 +77,18 @@
             React.createElement('line', { x1: 14.31, y1: 16, x2: 2.83, y2: 16 }),
             React.createElement('line', { x1: 16.62, y1: 12, x2: 10.88, y2: 21.94 })
         );
-        
         const Sparkles = () => React.createElement('svg', { width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
-            React.createElement('path', { d: 'M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z' }),
+            React.createElement('path', { d: 'M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.582a.5.5 0 0 1 0 .962L15.5 14.063A2 2 0 0 0 14.063 15.5l-1.582 6.135a.5.5 0 0 1-.962 0L9.937 15.5Z' }),
             React.createElement('path', { d: 'M20 3v4' }),
             React.createElement('path', { d: 'M22 5h-4' }),
             React.createElement('path', { d: 'M4 17v2' }),
             React.createElement('path', { d: 'M5 18H3' })
         );
-        
         const Monitor = () => React.createElement('svg', { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
             React.createElement('rect', { x: 2, y: 3, width: 20, height: 14, rx: 2, ry: 2 }),
             React.createElement('line', { x1: 8, y1: 21, x2: 16, y2: 21 }),
             React.createElement('line', { x1: 12, y1: 17, x2: 12, y2: 21 })
         );
-        
         const Film = () => React.createElement('svg', { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
             React.createElement('rect', { x: 2, y: 3, width: 20, height: 18, rx: 2, ry: 2 }),
             React.createElement('line', { x1: 7, y1: 3, x2: 7, y2: 21 }),
@@ -84,11 +99,7 @@
             React.createElement('line', { x1: 17, y1: 15, x2: 22, y2: 15 })
         );
 
-        const VisualGuide = () => {
-          const [selectedMainCategory, setSelectedMainCategory] = useState('shots');
-          const [selectedSubCategory, setSelectedSubCategory] = useState('all');
-
-          const shotsData = [
+        const shotsData = [
             {
               id: 1,
               chinese: "遠景",
@@ -221,10 +232,9 @@
               bgColor: "bg-violet-50",
               icon: "🎯"
             }
-          ];
+        ];
 
-          const styleData = [
-            // 插畫風格
+        const styleData = [
             {
               id: 12,
               chinese: "插畫風",
@@ -285,7 +295,6 @@
               bgColor: "bg-gray-50",
               icon: "✏️"
             },
-            // 動畫風格
             {
               id: 17,
               chinese: "皮克斯風格",
@@ -334,7 +343,6 @@
               bgColor: "bg-purple-50",
               icon: "💫"
             },
-            // 攝影風格
             {
               id: 21,
               chinese: "寫實攝影",
@@ -395,7 +403,6 @@
               bgColor: "bg-teal-50",
               icon: "🎯"
             },
-            // 氛圍風格
             {
               id: 26,
               chinese: "柔和溫暖",
@@ -444,7 +451,6 @@
               bgColor: "bg-green-50",
               icon: "🌿"
             },
-            // 設計風格
             {
               id: 30,
               chinese: "平面風格",
@@ -493,7 +499,6 @@
               bgColor: "bg-blue-50",
               icon: "💻"
             },
-            // 特殊風格
             {
               id: 34,
               chinese: "奇幻風",
@@ -530,167 +535,179 @@
               bgColor: "bg-pink-50",
               icon: "☁️"
             }
-          ];
+        ];
 
-          const allData = [...shotsData, ...styleData];
+        const allData = [...shotsData, ...styleData];
 
-          const mainCategories = [
+        const mainCategories = [
             { key: 'shots', label: '鏡頭結構詞', icon: React.createElement(Camera) },
             { key: 'styles', label: '風格結構詞', icon: React.createElement(Palette) }
-          ];
+        ];
 
-          const getSubCategories = (mainCat) => {
+        const getSubCategories = (mainCat) => {
             if (mainCat === 'shots') {
-              return ['all', '基本構圖', '角度技巧', '視角技巧', '動態技巧', '技術控制'];
+                return ['all', '基本構圖', '角度技巧', '視角技巧', '動態技巧', '技術控制'];
             } else if (mainCat === 'styles') {
-              return ['all', '插畫風格', '動畫風格', '攝影風格', '氛圍風格', '設計風格', '特殊風格'];
+                return ['all', '插畫風格', '動畫風格', '攝影風格', '氛圍風格', '設計風格', '特殊風格'];
             }
             return ['all'];
-          };
+        };
 
-          const filteredData = useMemo(() => {
-            return allData.filter(item => {
-              const matchesMainCategory = item.mainCategory === selectedMainCategory;
-              const matchesSubCategory = selectedSubCategory === 'all' || item.subCategory === selectedSubCategory;
-              
-              return matchesMainCategory && matchesSubCategory;
-            });
-          }, [selectedMainCategory, selectedSubCategory]);
+        const VisualGuide = () => {
+            const [selectedMainCategory, setSelectedMainCategory] = useState('shots');
+            const [selectedSubCategory, setSelectedSubCategory] = useState('all');
 
-          const getCategoryIcon = (category) => {
-            const iconMap = {
-              '基本構圖': React.createElement(Camera),
-              '角度技巧': React.createElement(Eye),
-              '視角技巧': React.createElement(Eye),
-              '動態技巧': React.createElement(Move),
-              '技術控制': React.createElement(Aperture),
-              '插畫風格': React.createElement(Palette),
-              '動畫風格': React.createElement(Film),
-              '攝影風格': React.createElement(Camera),
-              '氛圍風格': React.createElement(Sparkles),
-              '設計風格': React.createElement(Monitor),
-              '特殊風格': React.createElement(Sparkles)
+            const filteredData = useMemo(() => {
+                return allData.filter(item => {
+                    const matchesMainCategory = item.mainCategory === selectedMainCategory;
+                    const matchesSubCategory = selectedSubCategory === 'all' || item.subCategory === selectedSubCategory;
+                    return matchesMainCategory && matchesSubCategory;
+                });
+            }, [selectedMainCategory, selectedSubCategory]);
+
+            const getCategoryIcon = (category) => {
+                const iconMap = {
+                    '基本構圖': React.createElement(Camera),
+                    '角度技巧': React.createElement(Eye),
+                    '視角技巧': React.createElement(Eye),
+                    '動態技巧': React.createElement(Move),
+                    '技術控制': React.createElement(Aperture),
+                    '插畫風格': React.createElement(Palette),
+                    '動畫風格': React.createElement(Film),
+                    '攝影風格': React.createElement(Camera),
+                    '氛圍風格': React.createElement(Sparkles),
+                    '設計風格': React.createElement(Monitor),
+                    '特殊風格': React.createElement(Sparkles)
+                };
+                return iconMap[category] || React.createElement(Camera);
             };
-            return iconMap[category] || React.createElement(Camera);
-          };
 
-          return React.createElement("div", { className: "min-h-screen bg-gradient-to-br from-yellow-50 via-pink-50 to-blue-50 p-6" },
-            React.createElement("div", { className: "max-w-7xl mx-auto" },
-              React.createElement("div", { className: "text-center mb-12" },
-                React.createElement("h1", { className: "text-5xl font-bold mb-4 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent" },
-                  "攝影與風格詞彙指南"
-                ),
-                React.createElement("p", { className: "text-xl text-gray-600 max-w-2xl mx-auto" },
-                  "完整的鏡頭結構詞與風格結構詞參考，讓你的創作更具專業水準"
-                )
-              ),
+            useEffect(() => {
+                const watermark = document.getElementById('watermark-footer');
+                if (!watermark) return;
+                function handleScroll() {
+                    const scrollPos = window.scrollY + window.innerHeight;
+                    const fullHeight = document.documentElement.scrollHeight;
+                    if (scrollPos >= fullHeight - 2) {
+                        watermark.classList.add('visible');
+                    } else {
+                        watermark.classList.remove('visible');
+                    }
+                }
+                window.addEventListener('scroll', handleScroll, { passive: true });
+                handleScroll();
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
 
-              React.createElement("div", { className: "flex justify-center mb-8" },
-                React.createElement("div", { className: "bg-white rounded-2xl p-2 shadow-lg border border-gray-200" },
-                  mainCategories.map((category) =>
-                    React.createElement("button", {
-                      key: category.key,
-                      onClick: () => {
-                        setSelectedMainCategory(category.key);
-                        setSelectedSubCategory('all');
-                      },
-                      className: `px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center gap-3 ${
-                        selectedMainCategory === category.key
-                          ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg transform scale-105'
-                          : 'text-gray-600 hover:bg-gray-50'
-                      }`
-                    },
-                      category.icon,
-                      category.label
-                    )
-                  )
-                )
-              ),
-
-              React.createElement("div", { className: "mb-8 flex justify-center" },
-                React.createElement("div", { className: "flex flex-wrap gap-2" },
-                  getSubCategories(selectedMainCategory).map((category) =>
-                    React.createElement("button", {
-                      key: category,
-                      onClick: () => setSelectedSubCategory(category),
-                      className: `px-4 py-2 rounded-xl font-medium transition-all duration-200 flex items-center gap-2 shadow-md ${
-                        selectedSubCategory === category
-                          ? 'bg-gradient-to-r from-orange-400 to-pink-400 text-white shadow-lg transform scale-105'
-                          : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
-                      }`
-                    },
-                      category !== 'all' && getCategoryIcon(category),
-                      category === 'all' ? '全部' : category
-                    )
-                  )
-                )
-              ),
-
-              React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" },
-                filteredData.map((item, index) =>
-                  React.createElement("div", {
-                    key: item.id,
-                    className: `group relative overflow-hidden rounded-3xl border-2 border-gray-100 hover:border-gray-200 transition-all duration-300 hover:scale-105 hover:shadow-2xl shadow-lg ${item.bgColor}`,
-                    style: { animationDelay: `${index * 50}ms` }
-                  },
-                    React.createElement("div", { className: `absolute top-0 left-0 right-0 h-2 bg-gradient-to-r ${item.color}` }),
-                    
-                    React.createElement("div", { className: "relative p-6 h-full flex flex-col bg-white/70 backdrop-blur-sm" },
-                      React.createElement("div", { className: "flex items-start justify-between mb-4" },
-                        React.createElement("div", { className: "flex-1" },
-                          React.createElement("div", { className: "flex items-center gap-3 mb-3" },
-                            React.createElement("span", { className: "text-3xl" }, item.icon),
-                            React.createElement("span", { className: `px-3 py-1 rounded-full text-sm font-semibold bg-gradient-to-r ${item.color} text-white shadow-md` },
-                              item.subCategory
-                            )
-                          ),
-                          React.createElement("h3", { className: "text-2xl font-bold text-gray-800 mb-2 group-hover:text-pink-600 transition-colors" },
-                            item.chinese
-                          ),
-                          React.createElement("p", { className: "text-gray-600 text-sm font-medium bg-gray-100 px-3 py-1 rounded-lg" },
-                            item.english
-                          )
-                        )
-                      ),
-
-                      React.createElement("div", { className: "flex-1 space-y-4" },
-                        React.createElement("div", null,
-                          React.createElement("h4", { className: "text-pink-600 font-bold mb-2 flex items-center gap-2" },
-                            React.createElement("div", { className: "w-3 h-3 bg-pink-400 rounded-full shadow-sm" }),
-                            "用途與說明"
-                          ),
-                          React.createElement("p", { className: "text-gray-700 leading-relaxed bg-pink-50 p-3 rounded-xl" },
-                            item.description
-                          )
+            return React.createElement("div", { className: "min-h-screen bg-gradient-to-br from-yellow-50 via-pink-50 to-blue-50 p-6" },
+                React.createElement("div", { className: "max-w-7xl mx-auto" },
+                    React.createElement("div", { className: "text-center mb-12" },
+                        React.createElement("h1", { className: "text-5xl font-bold mb-4 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent" },
+                            "攝影與風格詞彙指南"
                         ),
-
-                        React.createElement("div", null,
-                          React.createElement("h4", { className: "text-purple-600 font-bold mb-2 flex items-center gap-2" },
-                            React.createElement("div", { className: "w-3 h-3 bg-purple-400 rounded-full shadow-sm" }),
-                            "建議用法"
-                          ),
-                          React.createElement("p", { className: "text-gray-700 leading-relaxed bg-purple-50 p-3 rounded-xl" },
-                            item.usage
-                          )
+                        React.createElement("p", { className: "text-xl text-gray-600 max-w-2xl mx-auto" },
+                            "完整的鏡頭結構詞與風格結構詞參考，讓你的創作更具專業水準"
                         )
-                      ),
-
-                      React.createElement("div", { className: `absolute inset-0 bg-gradient-to-t ${item.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none rounded-3xl` })
+                    ),
+                    React.createElement("div", { className: "flex justify-center mb-8" },
+                        React.createElement("div", { className: "bg-white rounded-2xl p-2 shadow-lg border border-gray-200" },
+                            mainCategories.map((category) =>
+                                React.createElement("button", {
+                                    key: category.key,
+                                    onClick: () => {
+                                        setSelectedMainCategory(category.key);
+                                        setSelectedSubCategory('all');
+                                    },
+                                    className: `px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center gap-3 ${
+                                        selectedMainCategory === category.key
+                                            ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg transform scale-105'
+                                            : 'text-gray-600 hover:bg-gray-50'
+                                    }`
+                                },
+                                    category.icon,
+                                    category.label
+                                )
+                            )
+                        )
+                    ),
+                    React.createElement("div", { className: "mb-8 flex justify-center" },
+                        React.createElement("div", { className: "flex flex-wrap gap-2" },
+                            getSubCategories(selectedMainCategory).map((category) =>
+                                React.createElement("button", {
+                                    key: category,
+                                    onClick: () => setSelectedSubCategory(category),
+                                    className: `px-4 py-2 rounded-xl font-medium transition-all duration-200 flex items-center gap-2 shadow-md ${
+                                        selectedSubCategory === category
+                                            ? 'bg-gradient-to-r from-orange-400 to-pink-400 text-white shadow-lg transform scale-105'
+                                            : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+                                    }`
+                                },
+                                    category !== 'all' && getCategoryIcon(category),
+                                    category === 'all' ? '全部' : category
+                                )
+                            )
+                        )
+                    ),
+                    React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" },
+                        filteredData.map((item, index) =>
+                            React.createElement("div", {
+                                key: item.id,
+                                className: `group relative overflow-hidden rounded-3xl border-2 border-gray-100 hover:border-gray-200 transition-all duration-300 hover:scale-105 hover:shadow-2xl shadow-lg ${item.bgColor}`,
+                                style: { animationDelay: `${index * 50}ms` }
+                            },
+                                React.createElement("div", { className: `absolute top-0 left-0 right-0 h-2 bg-gradient-to-r ${item.color}` }),
+                                React.createElement("div", { className: "relative p-6 h-full flex flex-col bg-white/70 backdrop-blur-sm" },
+                                    React.createElement("div", { className: "flex items-start justify-between mb-4" },
+                                        React.createElement("div", { className: "flex-1" },
+                                            React.createElement("div", { className: "flex items-center gap-3 mb-3" },
+                                                React.createElement("span", { className: "text-3xl" }, item.icon),
+                                                React.createElement("span", { className: `px-3 py-1 rounded-full text-sm font-semibold bg-gradient-to-r ${item.color} text-white shadow-md` },
+                                                    item.subCategory
+                                                )
+                                            ),
+                                            React.createElement("h3", { className: "text-2xl font-bold text-gray-800 mb-2 group-hover:text-pink-600 transition-colors" },
+                                                item.chinese
+                                            ),
+                                            React.createElement("p", { className: "text-gray-600 text-sm font-medium bg-gray-100 px-3 py-1 rounded-lg" },
+                                                item.english
+                                            )
+                                        )
+                                    ),
+                                    React.createElement("div", { className: "flex-1 space-y-4" },
+                                        React.createElement("div", null,
+                                            React.createElement("h4", { className: "text-pink-600 font-bold mb-2 flex items-center gap-2" },
+                                                React.createElement("div", { className: "w-3 h-3 bg-pink-400 rounded-full shadow-sm" }),
+                                                "用途與說明"
+                                            ),
+                                            React.createElement("p", { className: "text-gray-700 leading-relaxed bg-pink-50 p-3 rounded-xl" },
+                                                item.description
+                                            )
+                                        ),
+                                        React.createElement("div", null,
+                                            React.createElement("h4", { className: "text-purple-600 font-bold mb-2 flex items-center gap-2" },
+                                                React.createElement("div", { className: "w-3 h-3 bg-purple-400 rounded-full shadow-sm" }),
+                                                "建議用法"
+                                            ),
+                                            React.createElement("p", { className: "text-gray-700 leading-relaxed bg-purple-50 p-3 rounded-xl" },
+                                                item.usage
+                                            )
+                                        )
+                                    ),
+                                    React.createElement("div", { className: `absolute inset-0 bg-gradient-to-t ${item.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none rounded-3xl` })
+                                )
+                            )
+                        )
+                    ),
+                    React.createElement("div", { className: "mt-20 text-center" },
+                        React.createElement("div", { className: "inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-pink-100 to-purple-100 border border-pink-200 shadow-lg" },
+                            React.createElement(Sparkles),
+                            React.createElement("span", { className: "text-gray-700 font-medium" },
+                                "掌握這些專業詞彙，讓你的創作表達更精準有力"
+                            )
+                        )
                     )
-                  )
                 )
-              ),
-
-              React.createElement("div", { className: "mt-20 text-center" },
-                React.createElement("div", { className: "inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-pink-100 to-purple-100 border border-pink-200 shadow-lg" },
-                  React.createElement(Sparkles),
-                  React.createElement("span", { className: "text-gray-700 font-medium" },
-                    "掌握這些專業詞彙，讓你的創作表達更精準有力"
-                  )
-                )
-              )
-            )
-          );
+            );
         };
 
         ReactDOM.render(React.createElement(VisualGuide), document.getElementById('root'));
