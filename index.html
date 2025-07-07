@@ -22,18 +22,18 @@
     <script type="text/babel">
         const { useState, useMemo } = React;
         
-        // ...（此處省略原有icon與資料宣告，保持不變）
+        // --- Icons 省略，直接貼原始檔案即可 ---
+
+        // ...（請將你的 icon 與 data 定義區塊貼在這裡）
 
         const VisualGuide = () => {
-          // ...（此處省略原有state、資料、函式等）
+          // ...（請將你的主程式內容貼在這裡，原本的都不需改）
 
-          // ...（原有所有內容保持不變）
-
-          // 新增一個浮動的footer
+          // 在 return 外層加上 React.Fragment，然後加一個右下角浮動 footer
           return React.createElement(React.Fragment, null,
             React.createElement("div", { className: "min-h-screen bg-gradient-to-br from-yellow-50 via-pink-50 to-blue-50 p-6" },
               React.createElement("div", { className: "max-w-7xl mx-auto" },
-                // ...（原有內容保持不變）
+                // ...（原本的內容都照貼）
                 React.createElement("div", { className: "mt-20 text-center" },
                   React.createElement("div", { className: "inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-pink-100 to-purple-100 border border-pink-200 shadow-lg" },
                     React.createElement(Sparkles),
@@ -44,7 +44,7 @@
                 )
               )
             ),
-            // Footer 右下角浮動
+            // 新增右下角浮動 footer
             React.createElement("div", {
               className:
                 "fixed bottom-4 right-6 z-50 text-gray-500 text-sm md:text-base opacity-80 pointer-events-none select-none",
